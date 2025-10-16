@@ -1,0 +1,89 @@
+version: "3.9"
+name: obs-na-pratica-ia-bypass
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.license.self_generated.type=basic
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+      - ./elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks: [ labnet ]
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.2
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5601/api/status >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks: [ labnet ]
+
+  mock-llm:
+    image: python:3.11-slim
+    container_name: mock-llm
+    working_dir: /mock
+    command: ["bash", "-lc", "pip install --no-cache-dir fastapi uvicorn httpx && uvicorn mock:app --host 0.0.0.0 --port 11435"]
+    volumes:
+      - ./mock-llm:/mock:ro
+    ports:
+      - "11435:11435"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:11435/health >/dev/null || exit 1"]
+      interval: 8s
+      timeout: 4s
+      retries: 10
+    networks: [ labnet ]
+
+  app:
+    build: ./app
+    container_name: logs-chat-app
+    env_file:
+      - .env
+    environment:
+      - ELASTIC_URL=${ELASTIC_URL:-http://elasticsearch:9200}
+      - DEFAULT_INDEX=${DEFAULT_INDEX:-app-logs}
+      - DEFAULT_TIME_RANGE=${DEFAULT_TIME_RANGE:-now-24h}
+      - MAX_DOCS=${MAX_DOCS:-30}
+      - USE_OLLAMA=false
+      - MOCK_LLM_URL=http://mock-llm:11435
+      - OPENAI_API_KEY=
+    ports:
+      - "8000:8000"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      mock-llm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks: [ labnet ]
+
+volumes:
+  esdata:
+
+networks:
+  labnet:
+    driver: bridge

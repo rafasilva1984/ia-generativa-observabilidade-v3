@@ -1,0 +1,3 @@
+cluster.name: obs-na-pratica-bypass
+node.name: node-1
+xpack.security.enabled: false

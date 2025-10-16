@@ -1,0 +1,6 @@
+Elasticsearch <-- FastAPI (RAG) --> LLM (OpenAI/Ollama)
+      ^             ^
+      |             |
+   Kibana       Postman/Swagger
+
+[Ingestão] -> índice clássico (app-logs) OU data stream (logs-app) OU ILM (app-logs-*)

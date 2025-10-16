@@ -1,0 +1,5 @@
+{"@timestamp":"2025-09-01T13:00:01Z","service.name":"checkout","log.level":"ERROR","message":"Timeout contacting auth API","http.response.status_code":500,"latency_ms":920}
+{"@timestamp":"2025-09-01T13:02:10Z","service.name":"auth","log.level":"WARN","message":"JWT signature invalid","http.response.status_code":401,"latency_ms":112}
+{"@timestamp":"2025-09-01T14:00:30Z","service.name":"catalog","log.level":"INFO","message":"Cache warm complete","latency_ms":45}
+{"@timestamp":"2025-09-01T14:01:05Z","service.name":"checkout","log.level":"ERROR","message":"DB pool exhausted","http.response.status_code":500,"latency_ms":1300}
+{"@timestamp":"2025-09-01T14:02:40Z","service.name":"payments","log.level":"ERROR","message":"Third-party gateway timeout","http.response.status_code":504,"latency_ms":2100}

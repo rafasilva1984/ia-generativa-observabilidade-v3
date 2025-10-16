@@ -1,0 +1,83 @@
+{
+  "info": {
+    "name": "IA Generativa Observabilidade LAB v3",
+    "_postman_id": "0b0c1f2a-aaaa-4444-bbbb-cccccccccccc",
+    "description": "Endpoints: /health, /query, /incident/summary",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Query Logs (default index)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/query",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "query"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"question\": \"Explique os erros 500 nas últimas 2 horas\", \"time_range\": \"now-2h\", \"size\": 30}"
+        }
+      }
+    },
+    {
+      "name": "Incident Summary (service=checkout)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/incident/summary",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "incident",
+            "summary"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"time_range\": \"now-2h\", \"service\": \"checkout\", \"size\": 50}"
+        }
+      }
+    }
+  ]
+}
